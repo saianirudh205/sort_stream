@@ -17,14 +17,18 @@ ENV PATH="/usr/local/go/bin:${PATH}"
 
 # Install Kafka
 WORKDIR /opt
-RUN curl -fsSL https://downloads.apache.org/kafka/3.6.1/kafka_2.13-3.6.1.tgz \
+#WORKDIR /opt
+RUN curl -fsSL https://dlcdn.apache.org/kafka/3.7.2/kafka_2.13-3.7.2.tgz \
     | tar -xz
-RUN mv kafka_2.13-3.6.1 kafka
+RUN mv kafka_2.13-3.7.2 kafka
 
 # Copy app
 WORKDIR /app
 COPY . .
 
+# ⚠️ This generates go.sum INSIDE the image
+RUN go mod tidy
+RUN go mod download
 # Build Go binaries
 RUN go build -o source source.go
 RUN go build -o sort sort_topics.go

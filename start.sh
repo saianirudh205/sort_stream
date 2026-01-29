@@ -17,7 +17,7 @@ sleep 5
 
 for t in id name continent; do
   /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 \
-    --create --if-not-exists --topic $t --partitions 4 --replication-factor 1
+    --create --if-not-exists --topic $t --partitions 1 --replication-factor 1
 done
 
 echo "Running source generator..."
