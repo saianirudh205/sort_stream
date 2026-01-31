@@ -30,7 +30,7 @@ COPY . .
 RUN go mod tidy
 RUN go mod download
 # Build Go binaries
-RUN go build -o source source.go
-RUN go build -o sort sort_topics.go
+RUN go build -o source pipeline.go
+RUN go build -o sort pipesort.go
 
 CMD ["bash", "start.sh"]
