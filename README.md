@@ -20,7 +20,7 @@ cd <repository-name>
 Or pull the latest changes if you already have the repo:
 
 ```bash
-git pull origin latest_dev
+git pull origin master
 ```
 
 ### 2. Build the Docker Image
