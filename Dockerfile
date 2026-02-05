@@ -27,10 +27,16 @@ WORKDIR /app
 COPY . .
 
 # ⚠️ This generates go.sum INSIDE the image
+#RUN go mod tidy
 RUN go mod tidy
 RUN go mod download
 # Build Go binaries
-RUN go build -o source batch_and_send.go
-RUN go build -o sort consumer/main.go
+
+RUN go build -o app 
+##source ./source
+
+
+# #RUN go build -o sort consumer/main.go
+# RUN go build -o sort ./consumer
 
 CMD ["bash", "start.sh"]

@@ -1,19 +1,11 @@
-package main
+package sort
 
-import (
-	
-	"container/heap"
-	"context"
-	"fmt"
-	"log"
-	"os"
-	"strconv"
-	"strings"
-	"sync"
-	"time"
-
-	"github.com/IBM/sarama"
-)
+// ---------------------------------------------------------------------------
+// Index-based heaps – all three share a *[]Packet (pointer-to-slice).
+// This is the critical part: every heap dereferences the SAME pointer,
+// so when AddPacket appends or flush resets the slice, all heaps see it
+// instantly. No stale references, no leaked memory.
+// ---------------------------------------------------------------------------
 
 type IDHeap struct {
 	idx     []int32
@@ -46,7 +38,6 @@ func (h *NameHeap) Pop() interface{} {
 	h.idx = h.idx[:n-1]
 	return v
 }
-
 
 type ContinentHeap struct {
 	idx     []int32

@@ -1,6 +1,4 @@
-package main
-
-package main
+package sort
 
 import (
 	"bufio"
@@ -9,13 +7,14 @@ import (
 	"fmt"
 	"log"
 	"os"
-	
-	
-	"sync"
 	"time"
 
 	"github.com/IBM/sarama"
 )
+
+// ---------------------------------------------------------------------------
+// K-way merge
+// ---------------------------------------------------------------------------
 
 type MergeItem struct {
 	packet    Packet

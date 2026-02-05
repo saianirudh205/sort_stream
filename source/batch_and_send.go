@@ -1,4 +1,4 @@
-package main
+package source
 
 import (
 	"context"
@@ -100,6 +100,3 @@ func producer() {
 	fmt.Println("Sent:", finalSent, "rate:", int(float64(finalSent)/elapsed), "msg/sec")
 }
 
-func main() {
-	producer()
-}

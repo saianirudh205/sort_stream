@@ -1,85 +1,23 @@
-package main
-package config
-
+package sort
 
 import (
-	
 	"context"
 	"fmt"
 	"log"
 	"os"
-	
-	
 	"sync"
 	"time"
-
-	"github.com/IBM/sarama"
 )
 
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
 
-
-
-type Config struct {
-	BrokerURL      string
-	SourceTopic    string
-	NumPartitions  int
-	HeapFlushSize  int
-}
-
-func Load() Config {
-	numPartitions, err := strconv.Atoi(os.Getenv("NUM_PARTITIONS"))
-	if err != nil {
-		log.Fatal("NUM_PARTITIONS is invalid or missing")
-	}
-
-	heapFlushSize, err := strconv.Atoi(os.Getenv("HEAP_FLUSH_SIZE"))
-	if err != nil {
-		log.Fatal("HEAP_FLUSH_SIZE is invalid or missing")
-	}
-
-	return Config{
-		BrokerURL:     os.Getenv("BROKER_URL"),
-		SourceTopic:   os.Getenv("SOURCE_TOPIC"),
-		NumPartitions: numPartitions,
-		HeapFlushSize: heapFlushSize,
-	}
-}
-
-
-
-func createOutputTopics(brokers []string, topics []string) {
-	config := sarama.NewConfig()
-	config.Version = sarama.V2_6_0_0
-
-	admin, err := sarama.NewClusterAdmin(brokers, config)
-	if err != nil {
-		log.Fatalf("admin connect: %v", err)
-	}
-	defer admin.Close()
-
-	for _, t := range topics {
-		err := admin.CreateTopic(t, &sarama.TopicDetail{
-			NumPartitions:     1,
-			ReplicationFactor: 1,
-		}, false)
-		if err != nil {
-			log.Printf("topic %s: %v (may already exist)", t, err)
-		} else {
-			log.Printf("created topic: %s", t)
-		}
-	}
-}
-
-
-
-func main() {
-	cfg := config.Load()
-
-	brokers := []string{cfg.BrokerURL}
-	sourceTopic := cfg.SourceTopic
-	numPartitions := cfg.NumPartitions
-	heapFlushSize := cfg.HeapFlushSize
-
+func packAndPush() {
+	brokers := []string{"localhost:9092"}
+	sourceTopic := "source"
+	numPartitions := 20
+	heapFlushSize := 5000
 	idleTimeout := 2 * time.Minute
 
 	outputTopics := map[string]string{
@@ -159,6 +97,7 @@ func main() {
 		outputTopics["id"], outputTopics["name"], outputTopics["continent"])
 
 
+	test()
 	sigChan := make(chan struct{})
 	<-sigChan
 }

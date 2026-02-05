@@ -1,16 +1,17 @@
-package main
+package sort
 
 import (
-	
-
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/IBM/sarama"
 )
+
+// ---------------------------------------------------------------------------
+// Partition consumer
+// ---------------------------------------------------------------------------
 
 func consumePartition(ctx context.Context, partition int, brokers []string,
 	sourceTopic string, tempDir string, heapFlushSize int, idleTimeout time.Duration) (int, error) {

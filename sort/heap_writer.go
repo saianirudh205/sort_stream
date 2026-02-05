@@ -1,19 +1,16 @@
-package main
+package sort
 
 import (
 	"bufio"
 	"container/heap"
-	
 	"fmt"
-	
 	"os"
-	
-	
 	"sync"
-	"time"
-
-	
 )
+
+// ---------------------------------------------------------------------------
+// HeapWriter
+// ---------------------------------------------------------------------------
 
 type HeapWriter struct {
 	packets *[]Packet // pointer-to-slice – the single source of truth

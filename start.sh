@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+
+
+
 echo "Starting Kafka..."
 
 # Start Zookeeper
@@ -26,7 +29,6 @@ done
 # echo "Running sorter..."
 # ./sort
 
-./source &
-./sort
+./app
 
 echo "Done."
