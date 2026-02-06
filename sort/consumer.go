@@ -65,8 +65,14 @@ func consumePartition(ctx context.Context, partition int, brokers []string,
 			}
 			count++
 			lastMsgTime = time.Now()
-			if count%100000 == 0 {
+			if count%1000000 == 0 {
 				log.Printf("[P%d] %d messages", partition, count)
+			}
+
+			if count == 12500000{
+				hw.Close()
+				log.Printf("[P%d] idle timeout total=%d written=%d", partition, count, hw.GetTotalWritten())
+				return count, nil
 			}
 
 		case err := <-pc.Errors():

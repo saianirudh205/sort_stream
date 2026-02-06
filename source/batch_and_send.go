@@ -2,83 +2,114 @@ package source
 
 import (
 	"context"
-	"fmt"
+	"flag"
+//	"fmt"
+	"log"
 	"math/rand"
+	"os"
+	"os/signal"
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/segmentio/kafka-go"
 )
 
-const (
-	brokerAddr = "localhost:9092"
-	topic      = "source"
-	total      = 5_000_000
-	numWorkers = 20
-	batchSize  = 2000
+var (
+	broker   = flag.String("broker", "localhost:9092", "Kafka broker")
+	topic    = flag.String("topic", "source", "Kafka topic")
+	total    = flag.Int64("total", 50_000_000, "Total records to generate")
+	workers  = flag.Int("workers", 4, "Number of workers")
+	batch    = flag.Int("batch", 2000, "Kafka batch size")
 )
 
 var (
-	continents   = [...]string{"North America", "Asia", "South America", "Europe", "Africa", "Australia"}
 	letters      = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	addressChars = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ")
+	continents   = []string{
+		"North America", "Asia", "South America",
+		"Europe", "Africa", "Australia",
+	}
 )
 
-func randString(r *rand.Rand, buf []byte, n int) []byte {
-	for i := 0; i < n; i++ {
-		buf = append(buf, letters[r.Intn(len(letters))])
+func randFromSet(r *rand.Rand, set []byte, n int) []byte {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = set[r.Intn(len(set))]
 	}
-	return buf
+	return b
 }
 
-func producer() {
-	var wg sync.WaitGroup
-	wg.Add(numWorkers)
+func producer(){
+	flag.Parse()
 
 	start := time.Now()
-	var sent int64
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	for w := 0; w < numWorkers; w++ {
+	// signals
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sig
+		log.Println("shutdown signal")
+		cancel()
+	}()
+
+	writer := &kafka.Writer{
+		Addr:         kafka.TCP(*broker),
+		Topic:        *topic,
+		BatchSize:    *batch,
+		RequiredAcks: kafka.RequireOne,
+		Compression:  kafka.Snappy,
+	}
+	defer writer.Close()
+
+	var globalID int64
+	var sent int64
+	var wg sync.WaitGroup
+
+	perWorker := *total / int64(*workers)
+
+	wg.Add(*workers)
+	for w := 0; w < *workers; w++ {
 		go func(worker int) {
 			defer wg.Done()
 
-			writer := &kafka.Writer{
-				Addr:         kafka.TCP(brokerAddr),
-				Topic:        topic,
-				BatchSize:    batchSize,
-				BatchTimeout: 10 * time.Millisecond,
-				Async:        true,
-				RequiredAcks: 0,
-				Compression:  kafka.Snappy,
-				Balancer:     &kafka.LeastBytes{},
-			}
-			defer writer.Close()
+			r := rand.New(rand.NewSource(time.Now().UnixNano() + int64(worker)))
+			msgs := make([]kafka.Message, 0, *batch)
 
-			r := rand.New(rand.NewSource(int64(worker)))
-			msgs := make([]kafka.Message, 0, batchSize)
-			var buf []byte
+			for i := int64(0); i < perWorker; i++ {
+				select {
+				case <-ctx.Done():
+					return
+				default:
+				}
 
-			for i := 0; i < total/numWorkers; i++ {
-				id := 1 + r.Int31n(5_100_000)
+				id := atomic.AddInt64(&globalID, 1)
 
-				buf = buf[:0]
-				buf = strconv.AppendInt(buf, int64(id), 10)
-				buf = append(buf, ',')
-				buf = randString(r, buf, 10) // name
-				buf = append(buf, ',')
-				buf = randString(r, buf, 15) // address
-				buf = append(buf, ',')
-				buf = append(buf, continents[r.Intn(len(continents))]...)
+				nameLen := 10 + r.Intn(6)
+				addrLen := 15 + r.Intn(6)
 
-				val := make([]byte, len(buf))
-				copy(val, buf)
+				record := make([]byte, 0, 64)
+				record = strconv.AppendInt(record, id, 10)
+				record = append(record, ',')
 
-				msgs = append(msgs, kafka.Message{Value: val})
+				record = append(record, randFromSet(r, letters, nameLen)...)
+				record = append(record, ',')
 
-				if len(msgs) == batchSize {
-					if err := writer.WriteMessages(context.Background(), msgs...); err != nil {
-						panic(fmt.Sprintf("worker %d: write failed: %v", worker, err))
+				record = append(record, randFromSet(r, addressChars, addrLen)...)
+				record = append(record, ',')
+
+				record = append(record, continents[r.Intn(len(continents))]...)
+
+				msgs = append(msgs, kafka.Message{Value: record})
+
+				if len(msgs) == cap(msgs) {
+					if err := writer.WriteMessages(ctx, msgs...); err != nil {
+						log.Fatalf("write failed: %v", err)
 					}
 					atomic.AddInt64(&sent, int64(len(msgs)))
 					msgs = msgs[:0]
@@ -86,8 +117,8 @@ func producer() {
 			}
 
 			if len(msgs) > 0 {
-				if err := writer.WriteMessages(context.Background(), msgs...); err != nil {
-					panic(fmt.Sprintf("worker %d: flush failed: %v", worker, err))
+				if err := writer.WriteMessages(ctx, msgs...); err != nil {
+					log.Fatalf("flush failed: %v", err)
 				}
 				atomic.AddInt64(&sent, int64(len(msgs)))
 			}
@@ -95,8 +126,12 @@ func producer() {
 	}
 
 	wg.Wait()
-	elapsed := time.Since(start).Seconds()
-	finalSent := atomic.LoadInt64(&sent)
-	fmt.Println("Sent:", finalSent, "rate:", int(float64(finalSent)/elapsed), "msg/sec")
-}
 
+	elapsed := time.Since(start)
+	log.Printf(
+		"done | sent=%d | elapsed=%s | rate=%.0f rows/sec",
+		sent,
+		elapsed,
+		float64(sent)/elapsed.Seconds(),
+	)
+}

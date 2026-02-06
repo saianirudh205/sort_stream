@@ -127,7 +127,7 @@ func mergeAndStream(ctx context.Context, sortKey string, inputFiles []string,
 		}
 
 		count++
-		if count%100000 == 0 {
+		if count%10000000 == 0 {
 			log.Printf("[%s] streamed %d (%.0f msg/s)", sortKey, count,
 				float64(count)/time.Since(start).Seconds())
 		}

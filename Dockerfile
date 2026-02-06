@@ -26,6 +26,8 @@ RUN mv kafka_2.13-3.7.2 kafka
 WORKDIR /app
 COPY . .
 
+RUN sed -i 's/\r$//' start.sh && chmod +x start.sh
+
 # ⚠️ This generates go.sum INSIDE the image
 #RUN go mod tidy
 RUN go mod tidy
