@@ -21,7 +21,7 @@ func packAndPush() {
 	sourceTopic := "source"
 	numPartitions := 4
 	heapFlushSize := 2000
-	idleTimeout := 2 * time.Minute
+	idleTimeout := 1 * time.Minute
 
 	maxRetries := 3
 	retryBackoff := 2 * time.Second

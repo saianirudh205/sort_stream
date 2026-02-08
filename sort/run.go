@@ -5,7 +5,7 @@ import "context"
 func Run(ctx context.Context) error {
 	// existing source main logic goes here
 	packAndPush()
-	test()
+//	test()
 	<-ctx.Done()
 	return nil
 }

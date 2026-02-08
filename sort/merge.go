@@ -452,7 +452,7 @@ func mergeAndStreamWithRetry(
 			heap.Push(mh, MergeItem{packet: p, fileIndex: item.fileIndex})
 		}
 
-		if produced%100000 == 0 {
+		if produced%10000000 == 0 {
 			log.Printf("[%s] streamed %d (%.0f msg/s, %d errors)",
 				sortKey,
 				produced,
