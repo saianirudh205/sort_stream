@@ -193,6 +193,9 @@ func packAndPush() {
 					outputTopics[k],
 				)
 
+				//log.Printf("[DEBUG] mergeAndStream for key=%s returned: err=%v", k, err)
+
+
 				if err == nil {
 					return
 				}
@@ -215,6 +218,8 @@ func packAndPush() {
 					err,
 				)
 
+				log.Printf("here 221")
+
 				select {
 				case <-time.After(retryBackoff):
 				case <-ctx.Done():
@@ -224,10 +229,10 @@ func packAndPush() {
 		}(sortKey, files)
 	}
 
-	go func() {
+	   
 		wg2.Wait()
 		close(errCh2)
-	}()
+	
 
 	for err := range errCh2 {
 		if err != nil {

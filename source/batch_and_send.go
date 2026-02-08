@@ -20,7 +20,7 @@ import (
 var (
 	broker   = flag.String("broker", "localhost:9092", "Kafka broker")
 	topic    = flag.String("topic", "source", "Kafka topic")
-	total    = flag.Int64("total", 50_000_000, "Total records to generate")
+	total    = flag.Int64("total", 5_000_000, "Total records to generate")
 	workers  = flag.Int("workers", 4, "Number of workers")
 	batch    = flag.Int("batch", 2000, "Kafka batch size")
 )
