@@ -10,6 +10,11 @@ A Dockerized Kafka application for sorting and processing data streams.
 
 ## Getting Started
 
+### HLD
+## Architecture
+
+![High Level Architecture](docs/architecture.png)
+
 ### 1. Clone the Repository
 
 ```bash
