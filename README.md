@@ -108,8 +108,11 @@ To view current offsets for a topic:
 
 
 ## Unit tests 
-
+```
 go test ./sort
+go test ./source
+```
+![alt text](docs/test.png)
 
 
 
