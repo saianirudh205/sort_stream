@@ -159,27 +159,7 @@ sudo docker exec -it kafka-sort bash
   --max-messages 20
 
 Ex out put : 
-83,HxsZHhkOeU,WTOYodjcSHPxkUf,Australia
-106,hFgVwjTKoO,bfEajfUwQYPHcOL,Asia
-202,RSaBYsjtFQ,bmVRzOPntLbpDRL,Asia
-227,zxNDHvmHjr,KPxFhpNUHstuTpY,South America
-242,YIjeXupFDD,sEmrhVLcaqalXfx,Europe
-261,aTmJwXJIht,LLIwOnCPvUZIEHv,North America
-293,pHdcePfxgA,vXXMKwfhXuPaUWc,Africa
-303,lQYpuOQRGV,mRZApCdCpuEHHiD,Asia
-305,jIwZHQkPIB,qCjRZxDFpNIESWp,Asia
-332,iKrIxBsCcJ,TxglzwLrWAogOMd,Australia
-353,fYdKFakNpH,xilljCBxnkKmLzm,South America
-371,lSQpWECOXg,kgTnBhhIIVwvXYF,Asia
-407,eukXGwpZnc,tFEhpkaiDljLGFi,South America
-464,yrBMQGgkAb,xSIfwKSqIkHCFqk,Africa
-512,MlhIleIgCe,rwFtJkzDWQoBzAw,Asia
-621,GicLEAsLCs,cMYtiNGfSIWNRDR,North America
-645,FiBBVPjlxY,qnZKjoneDXZSaBz,Africa
-652,FeGwlOrMKY,VQWgqbhRhhNkSow,Europe
-665,szATZFSsaP,RRjXyocMttRsUau,North America
-772,RlyhLhuehf,PLuzdYoSxuUZjGO,North America
-Processed a total of 20 messages
+![alt text](image.png)
 
 
 
@@ -215,68 +195,69 @@ Example: Checking Message Count for continent Topic
   --bootstrap-server localhost:9092 \
   --topic continent
 
-Ex - output : continent:0:5000000
+Ex - output : 
+![alt text](image-1.png)
 
 7. Technical Details 
 
 
 
 7.1. Batch-Based Data Upload to Source
-The application ingests source data using batch uploads rather than individual record inserts.
- Batching significantly reduces I/O overhead and improves throughput during data ingestion.
-Key Characteristics:
-Source data is uploaded in fixed-size batches
+      The application ingests source data using batch uploads rather than individual record inserts.
+      Batching significantly reduces I/O overhead and improves throughput during data ingestion.
+      Key Characteristics:
+      Source data is uploaded in fixed-size batches
 
 
-Each batch is processed independently
+      Each batch is processed independently
 
 
-Batch ingestion improves performance and minimizes network and disk I/O calls
+      Batch ingestion improves performance and minimizes network and disk I/O calls
 
 
-Ensures stable performance under large data volumes
+      Ensures stable performance under large data volumes
 
 
 
 7.2. Multi-Threaded Processing Model
-The application uses a multi-threaded execution model to process incoming data efficiently.
-Thread Responsibilities:
-Each processing thread handles a subset of the incoming data stream
+    The application uses a multi-threaded execution model to process incoming data efficiently.
+    Thread Responsibilities:
+    Each processing thread handles a subset of the incoming data stream
 
 
-Threads operate independently to avoid contention
+    Threads operate independently to avoid contention
 
 
-Processing is parallelized to utilize available CPU cores efficiently
+    Processing is parallelized to utilize available CPU cores efficiently
 
 
 
 7.3. Sorting Logic ( heap +  merge )
-Within each processing thread, data is sorted using standard UNIX utilities.
-Processing Flow:
-Incoming batch data is passed through heap to limit the working set size
+    Within each processing thread, data is sorted using standard UNIX utilities.
+    Processing Flow:
+    Incoming batch data is passed through heap to limit the working set size
 
 
-Data is sorted merging the collected files and ingested to the kafka topic
+    Data is sorted merging the collected files and ingested to the kafka topic
 
 
-Sorted results are forwarded for Kafka publication
+    Sorted results are forwarded for Kafka publication
 
 
 
 7.4. Disk Persistence Every 5,000 Records
-To prevent excessive memory usage and ensure fault tolerance, the application persists intermediate results to disk.
-Persistence Strategy:
-Each thread writes processed data to disk after every 5,000 records
+    To prevent excessive memory usage and ensure fault tolerance, the application persists intermediate results to disk.
+    Persistence Strategy:
+    Each thread writes processed data to disk after every 5,000 records
 
 
-Disk flush acts as a checkpoint mechanism
+    Disk flush acts as a checkpoint mechanism
 
 
-Prevents memory exhaustion during large data processing
+    Prevents memory exhaustion during large data processing
 
 
-Allows partial recovery in case of failure
+    Allows partial recovery in case of failure
 
 
 
@@ -285,18 +266,18 @@ Allows partial recovery in case of failure
 
 
 8. Execution Summary
-The application is fully containerized using Docker.
+    The application is fully containerized using Docker.
 
 
-Kafka runs internally within the container.
+    Kafka runs internally within the container.
 
 
-Data is processed and published to three Kafka topics: id, name, and continent.
+    Data is processed and published to three Kafka topics: id, name, and continent.
 
 
-Execution time is approximately 3–5 minutes.
+    Execution time is approximately 3–5 minutes.
 
 
-Output verification and message counts are performed using Kafka CLI tools.
+    Output verification and message counts are performed using Kafka CLI tools.
 
 
