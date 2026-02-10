@@ -13,7 +13,7 @@ A Dockerized Kafka application for sorting and processing data streams.
 ### HLD
 ## Architecture
 
-![High Level Architecture](docs/architecture.png)
+![High Level Architecture](docs/HLD.md)
 
 ### 1. Clone the Repository
 
