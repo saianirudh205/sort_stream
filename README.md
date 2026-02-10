@@ -159,7 +159,7 @@ sudo docker exec -it kafka-sort bash
   --max-messages 20
 
 Ex out put : 
-![alt text](image.png)
+![alt text](docs/image.png)
 
 
 
@@ -196,7 +196,7 @@ Example: Checking Message Count for continent Topic
   --topic continent
 
 Ex - output : 
-![alt text](image-1.png)
+![alt text](docs/image-1.png)
 
 7. Technical Details 
 
