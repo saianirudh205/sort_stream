@@ -13,7 +13,7 @@ A Dockerized Kafka application for sorting and processing data streams.
 ### HLD
 ## Architecture
 
-![High Level Architecture](docs/arc.png)
+![High Level Architecture](docs/arc2.png)
 
 ### 1. Clone the Repository
 
