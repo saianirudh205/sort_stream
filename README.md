@@ -245,7 +245,7 @@ Ex - output :
 
 
 
-7.4. Disk Persistence Every 5,000 Records
+7.4. Disk Persistence Every 2,000 Records
     To prevent excessive memory usage and ensure fault tolerance, the application persists intermediate results to disk.
     Persistence Strategy:
     Each thread writes processed data to disk after every 5,000 records
