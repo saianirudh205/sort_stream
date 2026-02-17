@@ -18,7 +18,7 @@ A Dockerized Kafka application for sorting and processing data streams.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/saianirudh205/sort_stream)
+git clone https://github.com/saianirudh205/sort_stream
 cd sort_stream
 ```
 
