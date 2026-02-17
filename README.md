@@ -28,7 +28,7 @@ Or pull the latest changes if you already have the repo:
 git pull origin master
 ```
 
-### 2. OR Pull the image from dockerHub
+### 2. Or Pull the image from dockerHub
 
 
 
