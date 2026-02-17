@@ -270,7 +270,7 @@ Ex - output :
     Data is processed and published to three Kafka topics: id, name, and continent.
 
 
-    Execution time is approximately 3–5 minutes.
+    Execution time is approximately 10 minutes.
 
 
     Output verification and message counts are performed using Kafka CLI tools.
