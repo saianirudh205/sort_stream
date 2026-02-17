@@ -30,11 +30,7 @@ git pull origin master
 
 ### 2. Build the Docker Image
 
-```bash
-sudo docker build -t kafka-sort .
-```
 
-of 
 
 ```bash
 docker pull saianirudh711/kafka-sort
@@ -43,11 +39,8 @@ docker pull saianirudh711/kafka-sort
 ### 3. Run the Container
 
 ```bash
-sudo docker run --name kafka-sort --rm -it \
-  --memory=2g \
-  --memory-swap=2g \
-  --cpus=4 \
-  kafka-sort
+docker build -t kafka-sort . && docker run --name kafka-sort --rm -it --memory=2g --memory-swap=2g --cpus=4 kafka-sort
+
 ```
 
 **Container Resource Limits:**
