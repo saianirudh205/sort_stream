@@ -6,3 +6,5 @@ jobs:
     steps:
       - name: SSH into Mac
         uses: mxschmitt/action-tmate@v3
+        with:
+          authorized-keys: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMzpxvTD0jakLGa9XO9JoJ3aVaNXH+O95h5Ce4688kM anirudh00dimpu07@gmail.com"
