@@ -1,8 +1,0 @@
-name: macOS Terminal
-on: workflow_dispatch
-jobs:
-  build:
-    runs-on: macos-latest
-    steps:
-      - name: SSH into Mac
-        uses: mxschmitt/action-tmate@v3
